@@ -27,6 +27,13 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
             let csv = try CSV(contentsOfURL: path)
             let rows = csv.rows
             print(rows)
+            
+            for row in rows {
+                let name = row["identifier"]!
+                let pokeID = Int(row["id"]!)!
+                let poke = Pokemon(name: name, pokedexId: pokeID)
+                pokemon.append(poke)
+            }
         } catch let error as NSError {
             print(error.debugDescription)
         }
@@ -34,8 +41,8 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("PokeCell", forIndexPath: indexPath) as! PokeCell
-        let pokemon = Pokemon(name: "Test", pokedexId: indexPath.row + 1)
-        cell.configureCell(pokemon)
+        let poke = pokemon[indexPath.row]
+        cell.configureCell(poke)
         return cell
     }
     
