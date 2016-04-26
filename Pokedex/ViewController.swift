@@ -24,23 +24,22 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         collection.dataSource = self
         searchBar.delegate = self
         searchBar.returnKeyType = UIReturnKeyType.Done
-        
         parsePokemonCSV()
         initAudio()
+        
     }
     
     func initAudio() {
         let path = NSBundle.mainBundle().pathForResource("music", ofType: "mp3")!
-        
+
         do {
             musicPlayer = try AVAudioPlayer(contentsOfURL: NSURL (string: path)!)
             musicPlayer.prepareToPlay()
             musicPlayer.numberOfLoops = -1
             musicPlayer.play()
         } catch let error as NSError {
-            print(error.debugDescription)
+        print(error.debugDescription)
         }
-        
     }
     
     func parsePokemonCSV() {
@@ -76,6 +75,15 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         
+        let poke: Pokemon!
+        
+        if searchBarIsSearching {
+            poke = filteredPokemon[indexPath.row]
+        } else {
+            poke = pokemon[indexPath.row]
+        }
+        
+        performSegueWithIdentifier("PokemonDetailsVC", sender: poke)
         
     }
     
@@ -83,7 +91,6 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         if searchBarIsSearching {
             return filteredPokemon.count
         }
-        
         return pokemon.count
     }
     
@@ -121,7 +128,15 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
             filteredPokemon = pokemon.filter({$0.name.rangeOfString(lower) != nil})
             collection.reloadData()
         }
-        
+    }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == "PokemonDetailsVC" {
+            musicPlayer.stop()
+            let destination = segue.destinationViewController as? PokemonDetailsViewController
+            let poke = sender as? Pokemon
+            destination?.pokemon = poke
+        }
     }
 
 }
